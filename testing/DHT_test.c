@@ -8,6 +8,7 @@
  */
 #include "../core/network.h"
 #include "../core/DHT.h"
+#include "../core/log.h"
 
 #include <string.h>
 
@@ -82,6 +83,8 @@ void print_friendlist()
 
 int main(int argc, char *argv[])
 {
+	log_init();
+
     srand(time(NULL));
     int randdomnum = rand();
     memcpy(self_client_id, &randdomnum, 4);
@@ -98,7 +101,10 @@ int main(int argc, char *argv[])
     //bind to ip 0.0.0.0:PORT
     IP ip;
     ip.i = 0;
-    init_networking(ip, PORT);
+    if (init_networking(ip, PORT) == -1)
+	{
+		return 1;
+	}
 
     perror("Initialization");
     IP_Port bootstrap_ip_port;
@@ -148,5 +154,7 @@ int main(int argc, char *argv[])
     #ifdef WIN32
     WSACleanup();
     #endif
+
+	log_exit();
     return 0;   
 }

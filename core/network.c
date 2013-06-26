@@ -23,6 +23,7 @@
 */
 
 #include "network.h"
+#include "log.h"
 
 //our UDP socket, a global variable.
 static int sock;
@@ -77,6 +78,11 @@ int init_networking(IP ip ,uint16_t port)
     
     //initialize our socket
     sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); 
+	if (sock == -1)
+	{
+		log_print("socket() failed!", LOG_ERROR);
+		return -1;
+	}
     
     //Functions to increase the size of the send and recieve UDP buffers
     //NOTE: uncomment if necessary
@@ -104,7 +110,11 @@ int init_networking(IP ip ,uint16_t port)
     
     //Bind our socket to port PORT and address 0.0.0.0
     ADDR addr = {AF_INET, htons(port), ip}; 
-    bind(sock, (struct sockaddr*)&addr, sizeof(addr));   
+    if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) == -1)
+	{
+		log_print("bind failed!", LOG_ERROR);
+		return -1;
+	}
     return 0;
 
 }
