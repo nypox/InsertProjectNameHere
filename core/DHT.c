@@ -442,14 +442,14 @@ unsigned int getnodes(IP_Port ip_port, char * client_id)
 {
     if(is_gettingnodes(ip_port, 0))
     {
-        return 0;
+        return 1;
     }
     
     int ping_id = add_gettingnodes(ip_port);
     
     if(ping_id == 0)
     {
-        return 0;
+        return 1;
     }
     
     char data[5 + CLIENT_ID_SIZE*2];
