@@ -148,6 +148,7 @@ uint8_t init_networking(IP ip, uint16_t port)
 //function to cleanup networking stuff
 void shutdown_networking()
 {
+	close(sock);
     #ifdef WIN32
     WSACleanup();
     #endif
