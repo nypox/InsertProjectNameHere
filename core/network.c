@@ -25,12 +25,36 @@
 #include "network.h"
 #include "log.h"
 
+
+//returns current time in milleseconds since the epoch.
+uint64_t current_time()
+{
+    uint64_t time;
+    #ifdef WIN32
+    //TODO: windows version
+    #else
+    struct timeval a;
+    gettimeofday(&a, NULL);
+    time = 1000000UL*a.tv_sec + a.tv_usec;
+    #endif
+    return time;
+    
+}
+
+int random_int()
+{
+    #ifdef WIN32
+    //TODO replace rand with a more random windows function
+    return rand();
+    #else
+    return random();
+    #endif
+}
+
 //our UDP socket, a global variable.
 static int sock;
 
 //Basic network functions:
-//TODO: put them somewhere else than here
-
 //Function to send packet(data) of length length to ip_port
 unsigned int sendpacket(IP_Port ip_port, char * data, uint32_t length)
 {
@@ -73,7 +97,11 @@ uint8_t init_networking(IP ip, uint16_t port)
 		log_print("WSAStartup failed!", LOG_ERROR);
         return 0;
     }
+    
+    #else
+    srandom((uint32_t)current_time());
     #endif
+    srand((uint32_t)current_time());
     
     //initialize our socket
     sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP); 
@@ -117,11 +145,11 @@ uint8_t init_networking(IP ip, uint16_t port)
     return 1;
 }
 
-// Slam all the cleanup stuff here
-void exit_networking (void)
+//function to cleanup networking stuff
+void shutdown_networking()
 {
-	close(sock);
-	#ifdef WIN32
-	WSACleanup();
-	#endif
+    #ifdef WIN32
+    WSACleanup();
+    #endif
+    return;
 }

@@ -41,7 +41,8 @@ void print_clientlist()
         }
         p_ip = close_clientlist[i].ip_port;
         printf("\nIP: %u.%u.%u.%u Port: %u",p_ip.ip.c[0],p_ip.ip.c[1],p_ip.ip.c[2],p_ip.ip.c[3],ntohs(p_ip.port));
-        printf("\nTimestamp: %u\n", close_clientlist[i].timestamp);
+        printf("\nTimestamp: %u", close_clientlist[i].timestamp);
+        printf("\nLast pinged: %u\n", close_clientlist[i].last_pinged);
     }  
 }
 
@@ -74,12 +75,25 @@ void print_friendlist()
             }
             p_ip = friends_list[k].client_list[i].ip_port;
             printf("\nIP: %u.%u.%u.%u:%u",p_ip.ip.c[0],p_ip.ip.c[1],p_ip.ip.c[2],p_ip.ip.c[3],ntohs(p_ip.port));
-            printf("\nTimestamp: %u\n", friends_list[k].client_list[i].timestamp);
+            printf("\nTimestamp: %u", friends_list[k].client_list[i].timestamp);
+            printf("\nLast pinged: %u\n", friends_list[k].client_list[i].last_pinged);
         }
     }
 }
 
-
+void printpacket(char * data, uint32_t length, IP_Port ip_port)
+{
+    uint32_t i;
+    printf("UNHANDLED PACKET RECEIVED\nLENGTH:%u\nCONTENTS:\n", length);
+    printf("--------------------BEGIN-----------------------------\n");
+    for(i = 0; i < length; i++)
+    {
+        if(data[i] < 16)
+            printf("0");
+        printf("%hhX",data[i]);
+    }
+    printf("\n--------------------END-----------------------------\n\n\n");
+}
 
 int main(int argc, char *argv[])
 {
@@ -95,7 +109,6 @@ int main(int argc, char *argv[])
         exit(0);
     }
     addfriend(argv[3]);
-    
     
     //initialize networking
     //bind to ip 0.0.0.0:PORT
@@ -120,8 +133,6 @@ int main(int argc, char *argv[])
     char data[MAX_UDP_PACKET_SIZE];
     uint32_t length;
     
-    uint32_t i;
-    
     while(1)
     {
             
@@ -131,15 +142,8 @@ int main(int argc, char *argv[])
         {
             if(DHT_handlepacket(data, length, ip_port))
             {
-                printf("UNHANDLED PACKET RECEIVED\nLENGTH:%u\nCONTENTS:\n", length);
-                printf("--------------------BEGIN-----------------------------\n");
-                for(i = 0; i < length; i++)
-                {
-                    if(data[i] < 16)
-                        printf("0");
-                    printf("%hhX",data[i]);
-                }
-                printf("\n--------------------END-----------------------------\n\n\n");
+                //unhandled packet
+                printpacket(data, length, ip_port);
             }
             else
             {
@@ -151,8 +155,7 @@ int main(int argc, char *argv[])
         c_sleep(300);
     }
     
-	exit_networking();
-
+    shutdown_networking();
 	log_exit();
     return 0;   
 }
