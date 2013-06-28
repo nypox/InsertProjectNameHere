@@ -67,11 +67,11 @@ void log_print (char * msg, uint8_t type)
 
 void log_exit (void)
 {
-	if (log_f_info != stdout)
+	if (log_f_info != stdout && log_f_info != stderr)
 	{
 		fclose(log_f_info);
 	}
-	if (log_f_error != stderr)
+	if (log_f_error != stdout && log_f_error != stderr)
 	{
 		fclose(log_f_error);
 	}

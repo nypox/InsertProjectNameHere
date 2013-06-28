@@ -99,7 +99,7 @@ int DHT_handlepacket(char * packet, uint32_t length, IP_Port source);
 
 //Use this function to bootstrap the client
 //Sends a get nodes request to the given ip port
-void bootstrap(IP_Port ip_port);
+uint8_t bootstrap(IP_Port ip_port);
 
 
 //TODO:

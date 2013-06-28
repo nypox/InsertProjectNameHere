@@ -80,12 +80,12 @@ typedef struct
 //Basic network functions:
 
 //Function to send packet(data) of length length to ip_port
-int sendpacket(IP_Port ip_port, char * data, uint32_t length);
+unsigned int sendpacket(IP_Port ip_port, char * data, uint32_t length);
 
 //Function to recieve data, ip and port of sender is put into ip_port
 //the packet data into data
 //the packet length into length.
-int recievepacket(IP_Port * ip_port, char * data, uint32_t * length);
+unsigned int recievepacket(IP_Port * ip_port, char * data, uint32_t * length);
 
 //initialize networking
 //bind to ip and port
@@ -93,5 +93,8 @@ int recievepacket(IP_Port * ip_port, char * data, uint32_t * length);
 //port is in host byte order (this means don't worry about it)
 //returns 0 if no problems
 //TODO: add something to check if there are errors
-int init_networking(IP ip ,uint16_t port);
+uint8_t init_networking(IP ip, uint16_t port);
+
+// Clean up everything, WSACleanup and such
+void exit_networking (void);
 #endif

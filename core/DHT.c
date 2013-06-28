@@ -438,18 +438,18 @@ int pingres(IP_Port ip_port, uint32_t ping_id)
 }
 
 //send a getnodes request
-int getnodes(IP_Port ip_port, char * client_id)
+unsigned int getnodes(IP_Port ip_port, char * client_id)
 {
     if(is_gettingnodes(ip_port, 0))
     {
-        return 1;
+        return 0;
     }
     
     int ping_id = add_gettingnodes(ip_port);
     
     if(ping_id == 0)
     {
-        return 1;
+        return 0;
     }
     
     char data[5 + CLIENT_ID_SIZE*2];
@@ -460,7 +460,6 @@ int getnodes(IP_Port ip_port, char * client_id)
     memcpy(data + 5 + CLIENT_ID_SIZE, client_id, CLIENT_ID_SIZE);
 
     return sendpacket(ip_port, data, sizeof(data));
-    
 }
 
 
@@ -785,10 +784,8 @@ void doDHT()
 
 
 
-void bootstrap(IP_Port ip_port)
+uint8_t bootstrap(IP_Port ip_port)
 {
-
-    getnodes(ip_port, self_client_id);
-    
+    return getnodes(ip_port, self_client_id) > 0;
 }
 

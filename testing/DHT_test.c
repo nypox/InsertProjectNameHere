@@ -151,9 +151,7 @@ int main(int argc, char *argv[])
         c_sleep(300);
     }
     
-    #ifdef WIN32
-    WSACleanup();
-    #endif
+	exit_networking();
 
 	log_exit();
     return 0;   

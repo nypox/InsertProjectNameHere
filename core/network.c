@@ -32,18 +32,17 @@ static int sock;
 //TODO: put them somewhere else than here
 
 //Function to send packet(data) of length length to ip_port
-int sendpacket(IP_Port ip_port, char * data, uint32_t length)
+unsigned int sendpacket(IP_Port ip_port, char * data, uint32_t length)
 {
     ADDR addr = {AF_INET, ip_port.port, ip_port.ip}; 
     return sendto(sock, data, length, 0, (struct sockaddr *)&addr, sizeof(addr));
-    
 }
 
 //Function to recieve data, ip and port of sender is put into ip_port
 //the packet data into data
 //the packet length into length.
 //dump all empty packets.
-int recievepacket(IP_Port * ip_port, char * data, uint32_t * length)
+unsigned int recievepacket(IP_Port * ip_port, char * data, uint32_t * length)
 {
     ADDR addr;
     uint32_t addrlen = sizeof(addr);
@@ -52,12 +51,11 @@ int recievepacket(IP_Port * ip_port, char * data, uint32_t * length)
     {
         //nothing recieved
         //or empty packet
-        return -1;
+        return 0;
     }
     ip_port->ip = addr.ip;
     ip_port->port = addr.port;
-    return 0;
-    
+    return 1;
 }
 
 //initialize networking
@@ -66,13 +64,14 @@ int recievepacket(IP_Port * ip_port, char * data, uint32_t * length)
 //port is in host byte order (this means don't worry about it)
 //returns 0 if no problems
 //TODO: add something to check if there are errors
-int init_networking(IP ip ,uint16_t port)
+uint8_t init_networking(IP ip, uint16_t port)
 {
     #ifdef WIN32
     WSADATA wsaData;
     if(WSAStartup(MAKEWORD(2,2), &wsaData) != NO_ERROR)
     {
-        return -1;
+		log_print("WSAStartup failed!", LOG_ERROR);
+        return 0;
     }
     #endif
     
@@ -81,7 +80,7 @@ int init_networking(IP ip ,uint16_t port)
 	if (sock == -1)
 	{
 		log_print("socket() failed!", LOG_ERROR);
-		return -1;
+		return 0;
 	}
     
     //Functions to increase the size of the send and recieve UDP buffers
@@ -90,12 +89,12 @@ int init_networking(IP ip ,uint16_t port)
     int n = 1024 * 1024 * 2;
     if(setsockopt(sock, SOL_SOCKET, SO_RCVBUF, (char*)&n, sizeof(n)) == -1)
     {
-        return -1;
+        return 0;
     }
 
     if(setsockopt(sock, SOL_SOCKET, SO_SNDBUF, (char*)&n, sizeof(n)) == -1)
     {
-        return -1;
+        return 0;
     }*/
     
     //Set socket nonblocking
@@ -113,8 +112,16 @@ int init_networking(IP ip ,uint16_t port)
     if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) == -1)
 	{
 		log_print("bind failed!", LOG_ERROR);
-		return -1;
+		return 0;
 	}
-    return 0;
+    return 1;
+}
 
+// Slam all the cleanup stuff here
+void exit_networking (void)
+{
+	close(sock);
+	#ifdef WIN32
+	WSACleanup();
+	#endif
 }
