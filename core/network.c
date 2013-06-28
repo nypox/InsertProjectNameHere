@@ -25,7 +25,6 @@
 #include "network.h"
 #include "log.h"
 
-
 //returns current time in milleseconds since the epoch.
 uint64_t current_time()
 {
@@ -75,11 +74,11 @@ unsigned int recievepacket(IP_Port * ip_port, char * data, uint32_t * length)
     {
         //nothing recieved
         //or empty packet
-        return 0;
+        return -1;
     }
     ip_port->ip = addr.ip;
     ip_port->port = addr.port;
-    return 1;
+    return 0;
 }
 
 //initialize networking

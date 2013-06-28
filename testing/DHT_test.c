@@ -1,7 +1,7 @@
 /* DHT test
  * A file with a main that runs our DHT for testing.
  * 
- * Compile with: gcc -O2 -Wall -o test ../core/DHT.c ../core/network.c DHT_test.c
+ * Compile with: gcc -O2 -Wall -o test ../core/DHT.c ../core/network.c ../core/log.c DHT_test.c
  * 
  * Command line arguments are the ip and port of a node and the client_id (32 bytes) of the friend you want to find the ip_port of
  * EX: ./test 127.0.0.1 33445 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     //bind to ip 0.0.0.0:PORT
     IP ip;
     ip.i = 0;
-    if (init_networking(ip, PORT) == -1)
+    if (!init_networking(ip, PORT))
 	{
 		return 1;
 	}
